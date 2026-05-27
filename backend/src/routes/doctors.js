@@ -39,23 +39,20 @@ router.get('/stats', authenticate, async (req, res) => {
     const start = Date.now();
 
     // Independent database calls are run sequentially with await, stalling the event loop
-    const totalDoctors = await prisma.doctor.count();
+    // Independent database calls are run concurrently, freeing the event loop
+    const [totalDoctors, surgeonsCount, averageFee, highestExperience] = await Promise.all([
+      prisma.doctor.count(),
+      prisma.doctor.count({
+        where: { department: 'Surgery' },
+      }),
+      prisma.doctor.aggregate({
+        _avg: { consultationFee: true },
+      }),
+      prisma.doctor.aggregate({
+        _max: { experience: true },
+      }),
+    ]);
 
-    const surgeonsCount = await prisma.doctor.count({
-      where: { department: 'Surgery' },
-    });
-
-    const averageFee = await prisma.doctor.aggregate({
-      _avg: {
-        consultationFee: true,
-      },
-    });
-
-    const highestExperience = await prisma.doctor.aggregate({
-      _max: {
-        experience: true,
-      },
-    });
 
     const durationMs = Date.now() - start;
 

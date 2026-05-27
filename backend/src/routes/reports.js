@@ -13,50 +13,36 @@ router.get('/doctor-stats', authenticate, async (req, res) => {
   try {
     const start = Date.now();
 
-    // 1. Fetch all doctors
-    const doctors = await prisma.doctor.findMany();
-    const reportData = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // 2. Loop through every doctor and query databases sequentially!
-    for (const doc of doctors) {
-      console.log(`[SLOW REPORT] Querying stats sequentially for doctor: ${doc.name}`);
+    // 1. Fetch all data concurrently in bulk using grouping
+    const [doctors, apptGroups, queueGroups] = await Promise.all([
+      prisma.doctor.findMany(),
+      prisma.appointment.groupBy({
+        by: ['doctorId', 'status'],
+        _count: { id: true },
+      }),
+      prisma.queueToken.groupBy({
+        by: ['doctorId'],
+        where: { createdAt: { gte: today } },
+        _count: { id: true },
+      }),
+    ]);
 
-      // Count total appointments
-      const totalAppointments = await prisma.appointment.count({
-        where: { doctorId: doc.id },
-      });
+    // 2. Map the bulk data to the report structure in memory (no more DB queries inside a loop!)
+    const reportData = doctors.map(doc => {
+      // Find all appointment groups for this doctor
+      const docAppts = apptGroups.filter(a => a.doctorId === doc.id);
 
-      // Count completed appointments
-      const completedAppointments = await prisma.appointment.count({
-        where: { doctorId: doc.id, status: 'COMPLETED' },
-      });
+      const totalAppointments = docAppts.reduce((sum, a) => sum + a._count.id, 0);
+      const completedAppointments = docAppts.find(a => a.status === 'COMPLETED')?._count.id || 0;
+      const cancelledAppointments = docAppts.find(a => a.status === 'CANCELLED')?._count.id || 0;
+      const queueTokensCount = queueGroups.find(q => q.doctorId === doc.id)?._count.id || 0;
 
-      // Count cancelled appointments
-      const cancelledAppointments = await prisma.appointment.count({
-        where: { doctorId: doc.id, status: 'CANCELLED' },
-      });
+      const revenue = completedAppointments * doc.consultationFee;
 
-      // Fetch queue tokens count today
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const queueTokensCount = await prisma.queueToken.count({
-        where: {
-          doctorId: doc.id,
-          createdAt: { gte: today },
-        },
-      });
-
-      // Calculate total potential revenue
-      const appointmentsList = await prisma.appointment.findMany({
-        where: { doctorId: doc.id, status: 'COMPLETED' },
-      });
-      const revenue = appointmentsList.length * doc.consultationFee;
-
-      // Add artifical wait to simulate load under scaled database
-      // "Ensures database connection doesn't drop" - junior dev comment
-      await new Promise(r => setTimeout(r, 80));
-
-      reportData.push({
+      return {
         id: doc.id,
         name: doc.name,
         specialization: doc.specialization,
@@ -66,8 +52,9 @@ router.get('/doctor-stats', authenticate, async (req, res) => {
         cancelledAppointments,
         todayQueueSize: queueTokensCount,
         revenue,
-      });
-    }
+      };
+    });
+
 
     const durationMs = Date.now() - start;
 
