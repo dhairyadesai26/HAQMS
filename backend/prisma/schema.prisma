@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  RECEPTIONIST
+  DOCTOR
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum QueueStatus {
+  WAITING
+  CALLING
+  COMPLETED
+  SKIPPED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(RECEPTIONIST)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("User")
+}
+
+model Patient {
+  id            String        @id @default(cuid())
+  name          String
+  email         String?
+  phoneNumber   String
+  age           Int
+  gender        Gender
+  medicalHistory String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  appointments  Appointment[]
+  queueTokens   QueueToken[]
+
+  @@map("Patient")
+}
+
+model Doctor {
+  id              String   @id @default(cuid())
+  userId          String?  @unique
+  name            String
+  specialization  String
+  department      String
+  experience      Int      @default(0)
+  consultationFee Float    @default(0)
+  availableFrom   String   @default("09:00")
+  availableTo     String   @default("17:00")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  appointments Appointment[]
+  queueTokens  QueueToken[]
+
+  @@map("Doctor")
+}
+
+model Appointment {
+  id              String            @id @default(cuid())
+  patientId       String
+  doctorId        String
+  appointmentDate DateTime
+  reason          String?
+  status          AppointmentStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  patient     Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      Doctor       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  queueTokens QueueToken[]
+
+  @@map("Appointment")
+}
+
+model QueueToken {
+  id            String      @id @default(cuid())
+  tokenNumber   Int
+  patientId     String
+  doctorId      String
+  appointmentId String?
+  status        QueueStatus @default(WAITING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  patient     Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      Doctor       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@map("QueueToken")
+}
