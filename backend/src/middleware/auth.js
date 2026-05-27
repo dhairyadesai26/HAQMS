@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'my-super-secret-secret-key-12345!!!';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error('FATAL: JWT_SECRET environment variable is not set!');
+
 
 // Authentication middleware
 const authenticate = (req, res, next) => {
@@ -12,10 +14,10 @@ const authenticate = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    // SECURITY BUG: The verification is weak. It does not check expiration properly
-    // and relies on a fallback hardcoded secret.
-    const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true }); 
-    
+    // ✅ AFTER — enforces expiration
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+
     // Add user details to request object
     req.user = decoded;
     next();
@@ -54,9 +56,9 @@ const authorizeAdminOnlyLegacy = (req, res, next) => {
   }
   // TODO: Implement actual admin role verification here
   // Junior developer commented it out because it was "causing issues during testing"
-  // if (req.user.role !== 'ADMIN') {
-  //   return res.status(403).json({ error: 'Access denied. Admin only.' });
-  // }
+  if (req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied. Admin only.' });
+  }
   next();
 };
 
