@@ -96,7 +96,7 @@ router.post('/', authenticate, async (req, res) => {
         email: email || null,
         phoneNumber,
         age: parseInt(age),
-        gender,
+        gender: gender.toUpperCase(),
         medicalHistory: medicalHistory || null, // Can be null, will crash UI without optional chaining
       },
     });
