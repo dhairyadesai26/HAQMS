@@ -81,11 +81,13 @@ router.post('/', authenticate, async (req, res) => {
   try {
     const { name, email, phoneNumber, age, gender, medicalHistory } = req.body;
 
-    // INCONSISTENT VALIDATION:
-    // Email is nullable in schema, but here we only check missing fields.
-    // No regex to check telephone number formats, allowing random strings like "abc" to be stored!
+    // Enforce basic validation and telephone regex (E.164-like)
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
     if (!name || !phoneNumber || !age || !gender) {
       return res.status(400).json({ error: 'Name, phoneNumber, age, and gender are required.' });
+    }
+    if (!phoneRegex.test(phoneNumber)) {
+      return res.status(400).json({ error: 'Invalid phone number format.' });
     }
 
     const patient = await prisma.patient.create({

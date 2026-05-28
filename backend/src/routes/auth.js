@@ -18,9 +18,16 @@ router.post('/register', async (req, res) => {
 
     const { email, password, name, role } = req.body;
 
-    // MISSING VALIDATION: Does not check if email is valid format or if password is strong
+    // Validate email format and password strength
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'All fields are required' });
+    }
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -40,11 +47,12 @@ router.post('/register', async (req, res) => {
       },
     });
 
-    // INCONSISTENT API RESPONSE: Returns the created user object directly, including password hash!
-    // This is a major security flaw.
+    // Exclude password hash from response
+    const { password: _, ...userWithoutPassword } = user;
     res.status(201).json({
+      success: true,
       message: 'User registered successfully',
-      user,
+      data: { user: userWithoutPassword },
     });
   } catch (error) {
     // IMPROPER ERROR HANDLING: Leaking database errors and details
@@ -116,7 +124,7 @@ router.get('/me', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(user); // Returns flat object, inconsistent with the nested login response!
+    res.json({ success: true, data: { user } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

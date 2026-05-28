@@ -23,8 +23,8 @@ router.get('/', authenticate, async (req, res) => {
     });
 
 
-    // Inconsistent API formatting (directly sending array)
-    res.json(doctors);
+    // Standardized API response
+    res.json({ success: true, data: doctors });
   } catch (error) {
     // Leaks query syntax details to candidate/attacker
     res.status(500).json({ error: 'Database execution failure', sqlMessage: error.message });

@@ -131,10 +131,14 @@ export default function Dashboard() {
     e.preventDefault();
     setRegMessage('');
 
-    // INCONSISTENT VALIDATION: Receptionist form doesn't validate telephone structure on client, 
-    // leading to database pollution (e.g. text telephone values)
+    // Enforce E.164-like telephone structure on the client side
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
     if (!regName || !regPhone || !regAge) {
       setRegMessage('Error: Name, Age and Phone number are required.');
+      return;
+    }
+    if (!phoneRegex.test(regPhone)) {
+      setRegMessage('Error: Invalid phone number format. Use 10-15 digits.');
       return;
     }
 
