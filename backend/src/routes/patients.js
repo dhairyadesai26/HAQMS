@@ -10,6 +10,8 @@ const prisma = new PrismaClient();
 router.get('/', authenticate, async (req, res) => {
   try {
     const { search, gender } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
 
     // Inefficient: Retrieve all matching rows without take/skip limits from the database.
     // Scales poorly as patient directory grows.
