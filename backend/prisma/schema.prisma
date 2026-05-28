@@ -97,6 +97,7 @@ model Appointment {
   patient     Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
   doctor      Doctor       @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   queueTokens QueueToken[]
+  @@unique([doctorId, appointmentDate])
 
   @@map("Appointment")
 }
