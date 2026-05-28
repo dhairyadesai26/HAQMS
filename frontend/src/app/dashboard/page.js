@@ -116,7 +116,7 @@ export default function Dashboard() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      setDoctorsList(data);
+      setDoctorsList(data.success ? data.data : data);
     } catch (e) {
       console.error(e);
     }
@@ -365,8 +365,9 @@ export default function Dashboard() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setDoctorsList(data);
+      const doctorsArray = data.success ? data.data : data;
+      if (Array.isArray(doctorsArray)) {
+        setDoctorsList(doctorsArray);
       } else {
         alert(`API Error: ${data.sqlMessage || data.error}`);
       }
