@@ -2,81 +2,274 @@
 
 ## Overview
 
-**HAQMS (Hospital Appointment & Queue Management System)** is a full-stack healthcare management platform designed to streamline patient appointments, queue management, physician scheduling, and medical record access.
+**HAQMS (Hospital Appointment & Queue Management System)** is a modern full-stack healthcare management platform designed to streamline patient appointments, physician scheduling, queue management, and medical record access.
 
-The system provides dedicated workflows for Administrators, Receptionists, Doctors, and Patients while ensuring security, scalability, and performance across the platform.
+The application provides dedicated workflows for Administrators, Receptionists, Doctors, and Patients while maintaining high standards of security, performance, scalability, and reliability.
 
-This project was originally created as an engineering evaluation platform containing intentionally introduced bugs, vulnerabilities, performance bottlenecks, and incomplete features. All identified issues have now been thoroughly audited, resolved, and optimized.
+Originally developed as an engineering evaluation project containing intentionally introduced bugs, vulnerabilities, performance bottlenecks, race conditions, memory leaks, and incomplete features, the platform has since undergone a complete audit and refactoring process. All critical issues have been identified, resolved, and optimized.
 
 ---
 
-## Features
+## Live Features
 
-### Patient Management
+### 👨‍⚕️ Patient Management
 
 * Patient registration and profile management
-* Medical history tracking
 * Appointment booking and scheduling
-* Queue token generation and management
-* Clinical record viewing
+* Medical history tracking
+* Queue token generation
+* Diagnostic report viewing
+* Clinical record management
 
-### Doctor Management
+### 🩺 Doctor Portal
 
-* Physician scheduling
-* Daily patient worklists
-* Patient medical history access
-* Queue monitoring dashboard
+* Daily patient worklist
+* Appointment overview
+* Medical history access
+* Queue monitoring
+* Patient consultation management
 
-### Receptionist Operations
+### 🏥 Receptionist Dashboard
 
-* Appointment booking
 * Walk-in patient registration
+* Appointment booking
 * Queue check-in management
 * Real-time token assignment
 
-### Administration
+### 🛡️ Administration Panel
 
 * User management
-* System-wide reporting
-* Audit log monitoring
 * Physician registry management
-* Operational analytics
+* Audit log monitoring
+* Operational reporting
+* Analytics dashboard
 
 ---
 
-## Tech Stack
+# Tech Stack
 
-### Frontend
+## Frontend
 
-* Next.js (App Router)
+* Next.js 15 (App Router)
 * React
 * Tailwind CSS
 * Context API
-* Lucide Icons
+* Lucide React Icons
 
-### Backend
+## Backend
 
 * Node.js
 * Express.js
 * JWT Authentication
+* REST APIs
 
-### Database
+## Database & ORM
 
-* PostgreSQL
+* Supabase PostgreSQL
 * Prisma ORM
 
-### DevOps & Tooling
+## DevOps & Tooling
 
 * Docker Compose
-* Concurrently
-* ESLint
 * Prisma Migrations
+* ESLint
+* Concurrently
 
 ---
 
-## Setup Instructions
+# Key Improvements Completed
 
-### 1. Install Dependencies
+The original version intentionally contained multiple issues for engineering evaluation purposes. The application has now been fully audited and enhanced.
+
+## 🔒 Security Enhancements
+
+### Authentication & Authorization
+
+✅ Removed credential logging from authentication flows
+
+✅ Improved JWT signing and verification implementation
+
+✅ Moved secrets and sensitive configuration to environment variables
+
+✅ Added proper token validation middleware
+
+✅ Implemented robust Role-Based Access Control (RBAC)
+
+✅ Fixed authorization bypass vulnerabilities in administrative endpoints
+
+### Database Security
+
+✅ Eliminated SQL Injection vulnerabilities
+
+✅ Replaced unsafe raw SQL with parameterized Prisma queries
+
+✅ Added request validation and sanitization
+
+✅ Improved error handling to prevent information disclosure
+
+✅ Secured API responses against sensitive data leaks
+
+---
+
+## ⚡ Backend Performance Optimizations
+
+### Query Optimization
+
+✅ Fixed N+1 query issues using Prisma relation loading
+
+✅ Optimized nested reporting endpoints
+
+✅ Reduced unnecessary database round trips
+
+✅ Implemented efficient data fetching strategies
+
+### Async & Concurrency Improvements
+
+✅ Converted sequential async operations into parallel execution using Promise.all()
+
+✅ Reduced API response latency
+
+✅ Improved throughput under concurrent load
+
+### Queue Management
+
+✅ Fixed race conditions during patient check-in
+
+✅ Added transactional token generation
+
+✅ Prevented duplicate token assignment
+
+✅ Improved consistency during high-traffic scenarios
+
+---
+
+## 💾 Database Improvements
+
+### Data Integrity
+
+✅ Added unique constraints preventing physician double-booking
+
+✅ Strengthened relational integrity
+
+✅ Improved schema validation
+
+### Indexing
+
+Added optimized indexes on:
+
+* Appointment status
+* Queue status
+* Doctor references
+* Patient references
+* Frequently queried reporting fields
+
+### Pagination
+
+✅ Replaced in-memory pagination
+
+✅ Implemented SQL-level pagination
+
+✅ Reduced memory consumption
+
+✅ Improved response times on large datasets
+
+---
+
+## 🖥️ Frontend Optimizations
+
+### Memory Leak Fixes
+
+✅ Resolved memory leak in Live Queue Board
+
+✅ Proper cleanup of timers and intervals
+
+✅ Fixed component unmount handling
+
+### React Performance
+
+✅ Reduced unnecessary re-renders
+
+✅ Optimized state management
+
+✅ Added memoization where required
+
+✅ Improved rendering efficiency
+
+### Stability Improvements
+
+✅ Fixed null medical history crash
+
+✅ Added defensive rendering
+
+✅ Improved loading states
+
+✅ Added graceful error handling
+
+---
+
+## 🏗️ Feature Completion
+
+### Diagnostic Reports Module
+
+Previously missing route:
+
+```text
+src/app/patients/[id]/history-records/page.js
+```
+
+Successfully implemented with:
+
+* Patient clinical record retrieval
+* Medical history display
+* Diagnostic report rendering
+* Loading states
+* Error handling
+* Responsive UI
+
+---
+
+# Project Structure
+
+```bash
+HAQMS/
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   └── services/
+│   └── public/
+│
+├── backend/
+│   ├── prisma/
+│   ├── routes/
+│   ├── middleware/
+│   ├── services/
+│   ├── controllers/
+│   └── utils/
+│
+├── docker-compose.yml
+├── package.json
+└── README.md
+```
+
+---
+
+# Getting Started
+
+## 1. Clone Repository
+
+```bash
+git clone <repository-url>
+cd haqms
+```
+
+---
+
+## 2. Install Dependencies
+
+Run the setup script:
 
 ```bash
 chmod +x setup.sh
@@ -93,33 +286,46 @@ npm install --prefix backend
 
 ---
 
-### 2. Configure Database
+## 3. Configure Supabase Database
 
-Start PostgreSQL using Docker:
+Create a project on Supabase.
+
+Add the following variables to:
 
 ```bash
-docker-compose up -d
+backend/.env
 ```
 
-Or configure your own PostgreSQL instance and update:
-
 ```env
-DATABASE_URL="postgresql://<user>:<password>@localhost:5432/haqms?schema=public"
+DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?schema=public"
+
+DIRECT_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+
+JWT_SECRET="your-secret-key"
+
+PORT=5000
 ```
 
 ---
 
-### 3. Setup Database Schema
+## 4. Database Setup
 
-Run migrations and seed sample data:
+Apply migrations and seed data:
 
 ```bash
 npm run db:setup --prefix backend
 ```
 
+This command:
+
+* Creates database tables
+* Applies schema migrations
+* Configures constraints and indexes
+* Seeds test users and sample records
+
 ---
 
-### 4. Start Development Environment
+## 5. Run Development Environment
 
 ```bash
 npm run dev
@@ -127,17 +333,17 @@ npm run dev
 
 Services:
 
-| Service     | Port |
-| ----------- | ---- |
-| Frontend    | 3000 |
-| Backend API | 5000 |
-| PostgreSQL  | 5432 |
+| Service             | Port         |
+| ------------------- | ------------ |
+| Frontend            | 3000         |
+| Backend API         | 5000         |
+| Supabase PostgreSQL | Cloud Hosted |
 
 ---
 
-## Demo Accounts
+# Demo Accounts
 
-Default password for all accounts:
+Default Password:
 
 ```text
 password123
@@ -151,174 +357,110 @@ password123
 
 ---
 
-## Improvements & Fixes Completed
+# Security Architecture
 
-### Security Enhancements
-
-#### Authentication & Authorization
-
-* Removed credential logging from authentication flow.
-* Strengthened JWT signing and verification strategy.
-* Moved secrets to environment configuration.
-* Added proper token validation middleware.
-* Implemented role-based access control (RBAC).
-* Fixed authorization bypass vulnerabilities in admin-only endpoints.
-
-#### Database Security
-
-* Eliminated SQL injection vulnerabilities.
-* Replaced unsafe raw queries with parameterized Prisma queries.
-* Added server-side input validation and sanitization.
-* Improved error handling to prevent sensitive information leakage.
-
----
-
-### Backend Performance Improvements
-
-#### Database Optimization
-
-* Resolved N+1 query issues using Prisma relation loading.
-* Converted sequential database operations to parallel execution using `Promise.all()`.
-* Optimized reporting and aggregation endpoints.
-* Reduced API response times across high-traffic routes.
-
-#### Concurrency Fixes
-
-* Fixed queue token race condition.
-* Added transactional token generation.
-* Prevented duplicate token assignments during concurrent check-ins.
-* Improved consistency of appointment and queue operations.
-
----
-
-### Database & Schema Enhancements
-
-#### Data Integrity
-
-* Added unique constraints preventing physician double-booking.
-* Improved relational integrity across entities.
-* Added validation rules for critical healthcare records.
-
-#### Indexing
-
-* Added indexes on:
-
-  * Foreign key columns
-  * Appointment status fields
-  * Queue status fields
-  * Frequently queried reporting fields
-
-#### Pagination
-
-* Replaced in-memory pagination with database-level pagination.
-* Reduced memory consumption and query latency.
-
----
-
-### Frontend Optimizations
-
-#### React Performance
-
-* Eliminated memory leaks in the Live Queue Board.
-* Properly cleaned up intervals, timers, and subscriptions.
-* Added memoization where appropriate.
-* Reduced unnecessary component re-renders.
-
-#### Stability Improvements
-
-* Fixed null medical history rendering crash.
-* Added defensive rendering and fallback UI.
-* Improved error boundaries and loading states.
-
-#### User Experience
-
-* Faster search experience.
-* Improved responsiveness.
-* Better loading indicators.
-* Enhanced form validation and feedback.
-
----
-
-### Feature Completion
-
-#### Diagnostic Reports Module
-
-Implemented the previously missing page:
-
-```text
-src/app/patients/[id]/history-records/page.js
-```
-
-Features:
-
-* Clinical record retrieval
-* Medical history visualization
-* Diagnostic report display
-* Error handling
-* Loading states
-* Responsive UI
-
----
-
-## Architecture Highlights
-
-### Secure Authentication Flow
+### Authentication
 
 * JWT-based authentication
-* Protected API routes
+* Secure password hashing
+* Protected routes
 * Role-based permissions
-* Session validation
 
-### Scalable Database Design
+### Authorization
 
-* Indexed relational schema
-* Transaction-safe operations
-* Optimized query patterns
+* RBAC implementation
+* Endpoint-level access control
+* Middleware validation
 
-### Modern Frontend Architecture
+### Data Protection
 
-* Next.js App Router
-* Reusable UI components
-* Context-based state management
-* Responsive design
+* Parameterized database queries
+* Input sanitization
+* Environment-based secrets
+* Protected sensitive fields
 
 ---
 
-## Project Status
+# Performance Highlights
 
-### Current Status: Production Ready
+### Backend
 
-All originally identified:
+* Optimized database queries
+* Reduced API latency
+* Parallel async processing
+* Transaction-safe operations
+
+### Frontend
+
+* Memory leak free
+* Optimized React rendering
+* Improved state updates
+* Better user experience
+
+### Database
+
+* Indexed queries
+* Efficient pagination
+* Improved aggregation performance
+* Constraint-based consistency
+
+---
+
+# Deployment
+
+Recommended Production Stack
+
+| Component  | Provider            |
+| ---------- | ------------------- |
+| Frontend   | Vercel              |
+| Backend    | Render / Railway    |
+| Database   | Supabase PostgreSQL |
+| Storage    | Supabase Storage    |
+| Monitoring | Sentry              |
+| CI/CD      | GitHub Actions      |
+
+---
+
+# Future Roadmap
+
+### Planned Enhancements
+
+* Email appointment reminders
+* SMS notifications
+* Real-time WebSocket queue updates
+* Telemedicine support
+* Multi-hospital support
+* Advanced analytics dashboard
+* Exportable medical reports
+* Doctor availability prediction
+* AI-assisted appointment scheduling
+
+---
+
+# Project Status
+
+## ✅ Production Ready
+
+The application has undergone a complete engineering audit and refactoring cycle.
+
+All previously identified:
 
 * Security vulnerabilities
+* SQL injection risks
+* Authorization flaws
 * Performance bottlenecks
-* Concurrency issues
 * Database inefficiencies
-* Frontend crashes
+* Race conditions
 * Memory leaks
+* Frontend crashes
 * Missing features
 
 have been successfully resolved.
 
-The application is now stable, secure, optimized, and fully functional.
+HAQMS is now a secure, scalable, reliable, and production-ready healthcare management platform.
 
 ---
 
-## Future Enhancements
+# License
 
-Potential roadmap items:
-
-* Email appointment reminders
-* SMS notifications
-* Telemedicine integration
-* Advanced analytics dashboard
-* Multi-hospital support
-* Role-based audit exports
-* Real-time WebSocket queue updates
-* Automated appointment scheduling
-
----
-
-## License
-
-This project is intended for educational, internship evaluation, and healthcare management learning purposes.
+This project is intended for educational purposes, internship evaluations, portfolio demonstrations, and healthcare software architecture learning.
