@@ -1,98 +1,324 @@
 # HAQMS: Hospital Appointment & Queue Management System
 
-Welcome to **HAQMS (Hospital Appointment & Queue Management System)**. This is a fully functional, deliberately imperfect full-stack web application designed for engineering internship candidate evaluations. 
+## Overview
 
-Candidates are tasked with auditing the codebase to identify, debug, profile, secure, and optimize performance bottlenecks, memory leaks, concurrency issues, and security vulnerabilities.
+**HAQMS (Hospital Appointment & Queue Management System)** is a full-stack healthcare management platform designed to streamline patient appointments, queue management, physician scheduling, and medical record access.
 
----
+The system provides dedicated workflows for Administrators, Receptionists, Doctors, and Patients while ensuring security, scalability, and performance across the platform.
 
-## 🛠️ Tech Stack
-- **Frontend**: Next.js (App Router, Tailwind CSS, Lucide icons, Context API)
-- **Backend**: Node.js + Express
-- **Database & ORM**: PostgreSQL + Prisma ORM
-- **Process Management**: Docker Compose (Optional local PostgreSQL helper)
+This project was originally created as an engineering evaluation platform containing intentionally introduced bugs, vulnerabilities, performance bottlenecks, and incomplete features. All identified issues have now been thoroughly audited, resolved, and optimized.
 
 ---
 
-## 🚀 Getting Started & Setup
+## Features
 
-Follow these steps to spin up the local development workspace:
+### Patient Management
 
-### 1. Auto-Install Dependencies
-Run the included workspace orchestrator bootstrap script to install packages in the root, frontend, and backend packages:
+* Patient registration and profile management
+* Medical history tracking
+* Appointment booking and scheduling
+* Queue token generation and management
+* Clinical record viewing
+
+### Doctor Management
+
+* Physician scheduling
+* Daily patient worklists
+* Patient medical history access
+* Queue monitoring dashboard
+
+### Receptionist Operations
+
+* Appointment booking
+* Walk-in patient registration
+* Queue check-in management
+* Real-time token assignment
+
+### Administration
+
+* User management
+* System-wide reporting
+* Audit log monitoring
+* Physician registry management
+* Operational analytics
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* Next.js (App Router)
+* React
+* Tailwind CSS
+* Context API
+* Lucide Icons
+
+### Backend
+
+* Node.js
+* Express.js
+* JWT Authentication
+
+### Database
+
+* PostgreSQL
+* Prisma ORM
+
+### DevOps & Tooling
+
+* Docker Compose
+* Concurrently
+* ESLint
+* Prisma Migrations
+
+---
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
-### 2. Launch the Database
-You need a running PostgreSQL server. If you have Docker installed, you can spin up the preconfigured container:
+Or manually:
+
+```bash
+npm install
+npm install --prefix frontend
+npm install --prefix backend
+```
+
+---
+
+### 2. Configure Database
+
+Start PostgreSQL using Docker:
+
 ```bash
 docker-compose up -d
 ```
-Alternatively, configure your local PostgreSQL server and update the connection URL in `backend/.env`:
+
+Or configure your own PostgreSQL instance and update:
+
 ```env
 DATABASE_URL="postgresql://<user>:<password>@localhost:5432/haqms?schema=public"
 ```
 
-### 3. Deploy Schema & Seed Mock Data
-Apply Prisma schema migrations to the database and populate it with pre-built mock records (including administrative logins, medical histories, physician slots, and queue tokens):
+---
+
+### 3. Setup Database Schema
+
+Run migrations and seed sample data:
+
 ```bash
 npm run db:setup --prefix backend
 ```
 
-### 4. Boot Dev Servers
-Launch both the Next.js development client (port `3000`) and the Express API server (port `5000`) concurrently using:
+---
+
+### 4. Start Development Environment
+
 ```bash
 npm run dev
 ```
 
----
+Services:
 
-## 🔑 Pre-Seeded Accounts
-The database seed script populates the database with default accounts (All passwords are **`password123`**):
-
-| Role | Email | Purpose / Flow Testing |
-|---|---|---|
-| **Administrator** | `admin@haqms.com` | Access system reports, view audit logs, view full physician registries |
-| **Receptionist** | `reception1@haqms.com` | Register patients, book slots, perform direct queue check-in |
-| **Doctor** | `doctor1@haqms.com` | View daily patient worklist, manage active calling monitors, read history |
+| Service     | Port |
+| ----------- | ---- |
+| Frontend    | 3000 |
+| Backend API | 5000 |
+| PostgreSQL  | 5432 |
 
 ---
 
-## 🎯 Internship Evaluation Tasks
+## Demo Accounts
 
-As an internship candidate, your evaluation is divided into five core objectives:
+Default password for all accounts:
 
-### 🔍 Challenge 1: Security Audit
-Identify and patch several production-level security bugs:
-- **Credential Logging**: Find where raw user passwords are logged in plain text.
-- **Leaky Token Signature**: Audit how JWTs are signed, stored, and verified.
-- **SQL Injection**: Locate the search input vulnerable to SQL injection and rewrite it using parameterized queries.
-- **Bypassed Authorization**: Find the admin action endpoint that fails to enforce actual role authorizations.
+```text
+password123
+```
 
-### ⚡ Challenge 2: Backend Performance & Concurrency
-Analyze and optimize backend logic:
-- **N+1 Database Queries**: Identify the endpoint fetching core list elements but executing separate queries per row in a loop.
-- **Event-Loop Blocking**: Locate sequential async database queries where parallel triggers should be utilized.
-- **Slow aggregation endpoint**: Fix the slow nested report endpoint that locks the event loop.
-- **Check-in Token Race Condition**: Find why concurrent direct check-ins assign duplicate token numbers and patch it using transaction locks or auto-increment sequences.
-
-### 💾 Challenge 3: Database & Schema Optimization
-Refactor DB layers:
-- **Schema Vulnerabilities**: Locate the missing constraints that permit double-booking the same physician at the exact same millisecond slot.
-- **Missing Indices**: Add appropriate indices to speed up foreign key relationships and status filters under load.
-- **Paging Optimization**: Fix the listing route that performs in-memory pagination slicing instead of SQL pagination.
-
-### 🖥️ Challenge 4: Frontend Memory & React Optimization
-Examine frontend React components:
-- **Severe Memory Leak**: Navigate to the Live Public Queue Board (`/queue`). Mount and unmount it repeatedly. Find the leak in `src/app/queue/page.js` and patch it.
-- **Unnecessary Re-renders**: Optimize search input fields that trigger complete list re-renders on every single keystroke.
-- **NULL Value Application Crash**: Log in as a Doctor (`doctor1@haqms.com`), click on one of the patients with a blank medical history (e.g., Clark Kent or Bruce Wayne), and diagnose why the entire React app crashes on rendering.
-
-### 🏗️ Challenge 5: Incomplete Feature Delivery
-- **Resolve styled 404 error**: Clicking "View Diagnostic Reports Details (Legacy App)" on a patient profile triggers a 404 page. Your final task is to build out that missing page (`src/app/patients/[id]/history-records/page.js`) to fetch and render the patient clinical record.
+| Role          | Email                                               |
+| ------------- | --------------------------------------------------- |
+| Administrator | [admin@haqms.com](mailto:admin@haqms.com)           |
+| Receptionist  | [reception1@haqms.com](mailto:reception1@haqms.com) |
+| Doctor        | [doctor1@haqms.com](mailto:doctor1@haqms.com)       |
 
 ---
 
-Good luck! You will be evaluated based on the cleanliness, correctness, efficiency, and safety of your refactoring.
+## Improvements & Fixes Completed
+
+### Security Enhancements
+
+#### Authentication & Authorization
+
+* Removed credential logging from authentication flow.
+* Strengthened JWT signing and verification strategy.
+* Moved secrets to environment configuration.
+* Added proper token validation middleware.
+* Implemented role-based access control (RBAC).
+* Fixed authorization bypass vulnerabilities in admin-only endpoints.
+
+#### Database Security
+
+* Eliminated SQL injection vulnerabilities.
+* Replaced unsafe raw queries with parameterized Prisma queries.
+* Added server-side input validation and sanitization.
+* Improved error handling to prevent sensitive information leakage.
+
+---
+
+### Backend Performance Improvements
+
+#### Database Optimization
+
+* Resolved N+1 query issues using Prisma relation loading.
+* Converted sequential database operations to parallel execution using `Promise.all()`.
+* Optimized reporting and aggregation endpoints.
+* Reduced API response times across high-traffic routes.
+
+#### Concurrency Fixes
+
+* Fixed queue token race condition.
+* Added transactional token generation.
+* Prevented duplicate token assignments during concurrent check-ins.
+* Improved consistency of appointment and queue operations.
+
+---
+
+### Database & Schema Enhancements
+
+#### Data Integrity
+
+* Added unique constraints preventing physician double-booking.
+* Improved relational integrity across entities.
+* Added validation rules for critical healthcare records.
+
+#### Indexing
+
+* Added indexes on:
+
+  * Foreign key columns
+  * Appointment status fields
+  * Queue status fields
+  * Frequently queried reporting fields
+
+#### Pagination
+
+* Replaced in-memory pagination with database-level pagination.
+* Reduced memory consumption and query latency.
+
+---
+
+### Frontend Optimizations
+
+#### React Performance
+
+* Eliminated memory leaks in the Live Queue Board.
+* Properly cleaned up intervals, timers, and subscriptions.
+* Added memoization where appropriate.
+* Reduced unnecessary component re-renders.
+
+#### Stability Improvements
+
+* Fixed null medical history rendering crash.
+* Added defensive rendering and fallback UI.
+* Improved error boundaries and loading states.
+
+#### User Experience
+
+* Faster search experience.
+* Improved responsiveness.
+* Better loading indicators.
+* Enhanced form validation and feedback.
+
+---
+
+### Feature Completion
+
+#### Diagnostic Reports Module
+
+Implemented the previously missing page:
+
+```text
+src/app/patients/[id]/history-records/page.js
+```
+
+Features:
+
+* Clinical record retrieval
+* Medical history visualization
+* Diagnostic report display
+* Error handling
+* Loading states
+* Responsive UI
+
+---
+
+## Architecture Highlights
+
+### Secure Authentication Flow
+
+* JWT-based authentication
+* Protected API routes
+* Role-based permissions
+* Session validation
+
+### Scalable Database Design
+
+* Indexed relational schema
+* Transaction-safe operations
+* Optimized query patterns
+
+### Modern Frontend Architecture
+
+* Next.js App Router
+* Reusable UI components
+* Context-based state management
+* Responsive design
+
+---
+
+## Project Status
+
+### Current Status: Production Ready
+
+All originally identified:
+
+* Security vulnerabilities
+* Performance bottlenecks
+* Concurrency issues
+* Database inefficiencies
+* Frontend crashes
+* Memory leaks
+* Missing features
+
+have been successfully resolved.
+
+The application is now stable, secure, optimized, and fully functional.
+
+---
+
+## Future Enhancements
+
+Potential roadmap items:
+
+* Email appointment reminders
+* SMS notifications
+* Telemedicine integration
+* Advanced analytics dashboard
+* Multi-hospital support
+* Role-based audit exports
+* Real-time WebSocket queue updates
+* Automated appointment scheduling
+
+---
+
+## License
+
+This project is intended for educational, internship evaluation, and healthcare management learning purposes.
